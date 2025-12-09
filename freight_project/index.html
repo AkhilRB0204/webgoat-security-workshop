@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Freight Simulation</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+  <h1>Freight Simulation Dashboard</h1>
+  <div id="map" style="height:600px;"></div>
+
+  <script>
+    const map = L.map('map').setView([39.5, -98.35], 4); // Center US
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    async function refresh() {
+      const res = await fetch("/status");
+      const data = await res.json();
+
+      data.trucks.forEach(truck => {
+        L.circleMarker([truck.lat, truck.lon], {radius: 5, color: "blue"})
+          .bindPopup(`${truck.truck_id} - ${truck.status}`)
+          .addTo(map);
+      });
+    }
+
+    refresh();
+    setInterval(refresh, 3000); // update every 3 sec
+  </script>
+</body>
+</html>
