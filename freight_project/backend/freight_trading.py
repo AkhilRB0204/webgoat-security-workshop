@@ -95,9 +95,13 @@ class FreightSim:
                 # Check every truck to see which one is best
                 for truck_idx, truck in self.trucks.iterrows():
                     if truck['assigned_load'] is None:  # only free trucks
-                        s = self.score(truck_idx, load_idx)
-                        if s < best_score:
-                            best_score = s
+                        dist = self.haversine(truck['lat'], truck['lng'],
+                                              self.cities.at[load['origin_idx'], 'lat'],
+                                              self.cities.at[load['origin_idx'], 'lng'])
+                        capacity_penalty = 0 if truck['capacity'] >= load['weight'] else 1000
+                        score = dist + capacity_penalty
+                        if score < best_score:
+                            best_score = score
                             best_truck_idx = truck_idx
                 # Assign best truck found
                 if best_truck_idx is not None:
@@ -116,10 +120,8 @@ class FreightSim:
                 dest = self.cities.iloc[load['dest_idx']]
 
                 # Move halfway closer to destination each time we call this
-                truck_lat = truck['lat']
-                truck_lng = truck['lng']
-                truck_lat += (dest['lat'] - truck_lat) * 0.5
-                truck_lng += (dest['lng'] - truck_lng) * 0.5
+                truck_lat = truck['lat'] + (dest['lat'] - truck['lat']) * 0.5
+                truck_lng = truck['lng'] + (dest['lng'] - truck['lng']) * 0.5
 
                 # Update truck’s position
                 self.trucks.at[idx, 'lat'] = truck_lat
@@ -132,18 +134,4 @@ class FreightSim:
                     print(f"✅ Truck {truck['truck_id']} arrived at {dest['city']}, {dest['state_name']}")
                     # Remove load (delivered)
                     self.loads = self.loads[self.loads['load_id'] != load['load_id']]
-
-# --- Example simulation run ---
-if __name__ == "__main__":
-    sim = FreightSim("uscities.csv", num_trucks=10)
-
-    # Make 5 random shipments
-    for _ in range(5):
-        sim.create_random_load()
-
-    # Assign trucks to those shipments
-    sim.assign_loads()
-
-    # Move trucks step by step until some deliveries finish
-    for _ in range(10):
-        sim.update_trucks()
+                    print(f"📦 Load {load['load_id']} delivered and removed from system.")

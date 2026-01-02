@@ -13,7 +13,7 @@ def main():
     sim = FreightSim("uscities.csv", num_trucks=num_trucks, min_pop=min_pop)
 
     # Create loads
-    for _ in range(loads):
+    for _ in range(num_loads):
         sim.create_random_load()
 
     # Assign loads to trucks
@@ -21,8 +21,10 @@ def main():
 
     # Simulate step by step
     for step in range(num_steps):
-        print(f"\n--- Simulation Step {step+1} ---")
+        print(f"\n--- Step {step+1} ---")
         sim.update_trucks()
+        print(sim.trucks[['truck_id','city','status','assigned_load']])
+        print(sim.loads[['load_id','weight','assigned_truck']])
 
 if __name__ == "__main__":
     main()

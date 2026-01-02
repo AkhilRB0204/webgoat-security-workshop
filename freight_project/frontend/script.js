@@ -1,120 +1,63 @@
-let cities = [];
+const map = L.map('map').setView([39.5, -98.35], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// Load CSV file dynamically
-Papa.parse("uscities.csv", {
-  download: true,
-  header: true,
-  complete: (results) => {
-    cities = results.data;
-    console.log("Loaded cities:", cities.length);
-  }
-});
+let truckMarkers = {};
+let loadLines = {};
 
-// Pick a random city filtered by min population
-function randomCity(minPop) {
-  const filtered = cities.filter(c => parseInt(c.population) > minPop);
-  return filtered[Math.floor(Math.random() * filtered.length)];
-}
+async function refresh() {
+    const res = await fetch("http://127.0.0.1:8000/status");
+    const data = await res.json();
 
-// Haversine distance calculator (miles)
-function haversine(lat1, lon1, lat2, lon2) {
-  const R = 3956;
-  const toRad = x => (x * Math.PI) / 180;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2)**2 +
-    Math.cos(toRad(lat1)) *
-    Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2)**2;
-
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
-
-function startSimulation() {
-  const numTrucks = parseInt(document.getElementById("trucks").value);
-  const numLoads = parseInt(document.getElementById("loads").value);
-  const minPop = parseInt(document.getElementById("min_pop").value);
-
-  let output = "";
-
-  //----------------------------------
-  // 1. Create trucks
-  //----------------------------------
-  let trucks = [];
-  for (let i = 0; i < numTrucks; i++) {
-    let c = randomCity(minPop);
-    trucks.push({
-      id: "T" + (i+1),
-      city: c.city,
-      lat: parseFloat(c.lat),
-      lon: parseFloat(c.lng),
-      status: "Idle",
-      capacity: Math.floor(Math.random() * 20) + 10
-    });
-  }
-
-  //----------------------------------
-  // 2. Create loads
-  //----------------------------------
-  let loads = [];
-  for (let i = 0; i < numLoads; i++) {
-    let origin = randomCity(minPop);
-    let dest = randomCity(minPop);
-
-    loads.push({
-      id: "L" + (i+1),
-      origin: origin.city,
-      dest: dest.city,
-      latO: parseFloat(origin.lat),
-      lonO: parseFloat(origin.lng),
-      latD: parseFloat(dest.lat),
-      lonD: parseFloat(dest.lng),
-      weight: Math.floor(Math.random() * 20) + 5
-    });
-  }
-
-  //----------------------------------
-  // 3. Assign loads to trucks
-  //----------------------------------
-  loads.forEach(load => {
-    let bestTruck = null;
-    let bestScore = Infinity;
-
-    trucks.forEach(truck => {
-      if (truck.status === "Idle") {
-        if (truck.capacity < load.weight) return;
-
-        let dist = haversine(truck.lat, truck.lon, load.latO, load.lonO);
-
-        if (dist < bestScore) {
-          bestScore = dist;
-          bestTruck = truck;
+    // Trucks
+    data.trucks.forEach(truck => {
+        if (truckMarkers[truck.truck_id]) {
+            truckMarkers[truck.truck_id].setLatLng([truck.lat, truck.lon]);
+            truckMarkers[truck.truck_id].bindPopup(`${truck.truck_id} - ${truck.status}`);
+        } else {
+            truckMarkers[truck.truck_id] = L.circleMarker([truck.lat, truck.lon], {
+                radius: 6,
+                color: truck.status === "Idle" ? "green" : "orange"
+            }).addTo(map).bindPopup(`${truck.truck_id} - ${truck.status}`);
         }
-      }
     });
 
-    if (bestTruck) {
-      bestTruck.status = "Assigned → " + load.id;
-      load.assigned = bestTruck.id;
-    } else {
-      load.assigned = "NO AVAILABLE TRUCK";
-    }
-  });
+    // Loads (polylines)
+    data.loads.forEach(load => {
+        const lineId = load.load_id;
+        const origin = [load.latO || load.dest_lat, load.lonO || load.dest_lon];
+        const dest = [load.dest_lat, load.dest_lon];
 
-  //----------------------------------
-  // Output
-  //----------------------------------
-  output += "🚛 TRUCKS:\n";
-  trucks.forEach(t => {
-    output += `${t.id} — ${t.city} — ${t.status} — cap ${t.capacity}\n`;
-  });
+        if (!loadLines[lineId]) {
+            loadLines[lineId] = L.polyline([origin, dest], {
+                color: "orange",
+                weight: 2,
+                dashArray: '5,5'
+            }).addTo(map);
+        }
+    });
 
-  output += "\n📦 LOADS:\n";
-  loads.forEach(l => {
-    output += `${l.id} — ${l.origin} → ${l.dest} — weight ${l.weight} — assigned: ${l.assigned}\n`;
-  });
-
-  document.getElementById("output").innerText = output;
+    // Remove delivered loads
+    Object.keys(loadLines).forEach(lineId => {
+        if (!data.loads.some(l => l.load_id === lineId)) {
+            map.removeLayer(loadLines[lineId]);
+            delete loadLines[lineId];
+        }
+    });
 }
+
+// Initialize simulation
+async function startSimulation() {
+    const numTrucks = document.getElementById("numTrucks").value;
+    const numLoads = document.getElementById("numLoads").value;
+    const minPop = document.getElementById("minPop").value;
+
+    await fetch(`http://127.0.0.1:8000/init?num_trucks=${numTrucks}&num_loads=${numLoads}&min_pop=${minPop}`);
+    alert("Simulation started!");
+}
+
+async function createLoad() {
+    await fetch("http://127.0.0.1:8000/create_load");
+}
+
+// Auto-refresh every 1 second
+setInterval(refresh, 1000);
