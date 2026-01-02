@@ -26,7 +26,6 @@ def run_sim():
 # Start the background simulation thread
 threading.Thread(target=run_sim, daemon=True).start()
 
-
 # Initialize the simulation with dynamic parameters
 @app.get("/init")
 def init_sim(
@@ -43,7 +42,6 @@ def init_sim(
         sim.create_random_load()
 
     return {"message": f"Simulation initialized with {num_trucks} trucks and {num_loads} loads."}
-
 
 # Endpoint to return current status of trucks and loads
 @app.get("/status")
@@ -78,7 +76,6 @@ def get_status():
         })
 
     return {"trucks": trucks, "loads": loads}
-
 
 # Endpoint to create a new random load dynamically
 @app.get("/create_load")

@@ -4,7 +4,11 @@ body {
   padding: 20px;
 }
 
-h1 { color: #2e4053; text-align: center; margin-bottom: 30px; }
+h1 {
+  color: #2e4053;
+  text-align: center;
+  margin-bottom: 30px;
+}
 
 .input-box {
   background: white;
@@ -15,8 +19,16 @@ h1 { color: #2e4053; text-align: center; margin-bottom: 30px; }
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-label { font-weight: bold; }
-input { width: 100%; margin: 8px 0 16px; padding: 8px; }
+label {
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  margin: 8px 0 16px;
+  padding: 8px;
+}
+
 button {
   width: 100%;
   padding: 10px;
@@ -27,16 +39,12 @@ button {
   border-radius: 5px;
   cursor: pointer;
 }
-button:hover { background: #166a9c; }
 
-#map { height: 500px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+button:hover {
+  background: #166a9c;
+}
 
-#output {
-  background: white;
-  padding: 20px;
+#map {
   border-radius: 8px;
-  min-height: 120px;
-  white-space: pre-wrap;
-  font-family: monospace;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }

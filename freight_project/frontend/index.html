@@ -2,25 +2,30 @@
 <html>
 <head>
   <title>Freight Simulation</title>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Freight Simulation Dashboard</h1>
+
   <div class="input-box">
     <label>Number of Trucks:</label>
-    <input id="numTrucks" type="number" value="50">
+    <input id="numTrucks" type="number" value="50" />
+
     <label>Number of Loads:</label>
-    <input id="numLoads" type="number" value="20">
+    <input id="numLoads" type="number" value="20" />
+
     <label>Minimum Population:</label>
-    <input id="minPop" type="number" value="50000">
+    <input id="minPop" type="number" value="100000" />
+
     <button onclick="startSimulation()">Start Simulation</button>
     <button onclick="createLoad()">Create Random Load</button>
   </div>
-  <div id="map"></div>
-  <div id="output"></div>
+
+  <div id="map" style="height: 600px;"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
