@@ -4,7 +4,7 @@ import random
 from math import radians, cos, sin, asin, sqrt
 
 class FreightSim:
-    def __init__(self, csv_path="uscities.csv", num_trucks=50, min_pop=50000):
+    def __init__(self, csv_path="uscities.csv", num_trucks=50, min_pop=50000, enable_finance=False):
         # Load all US cities from the CSV file
         self.cities = pd.read_csv(csv_path)
 
@@ -13,13 +13,18 @@ class FreightSim:
         
         # Create a fleet of trucks
         self.num_trucks = num_trucks
+
+        # Finance tracking flag
+        self.enable_finance = enable_finance
+
         self.trucks = pd.DataFrame({
             'truck_id': [f"T{i+1}" for i in range(num_trucks)],   # Truck names T1, T2, ...
             'city_idx': np.random.choice(self.cities.index, num_trucks),  # Start trucks in random cities
             'capacity': np.random.randint(10, 30, num_trucks),    # Each truck can carry 10–30 tons
             'status': ['Idle'] * num_trucks,                      # Idle = waiting for a job
             'assigned_load': [None] * num_trucks,                # No load assigned yet
-            'profit': [0] * num_trucks                            # Track revenue earned
+            'profit': [0] * num_trucks,                           # Track revenue earned
+            'expense': [0]*num_trucks
         })
 
         # Add city details to each truck so we know where it is
@@ -140,6 +145,19 @@ class FreightSim:
                     # Add profit to truck
                     revenue = load['weight'] * load['rate_per_ton']
                     self.trucks.at[idx, 'profit'] += revenue
+
+                    if self.enable_finance:
+                        # For simplicity, assume a fixed expense per mile
+                        origin = self.cities.iloc[load['origin_idx']]
+                        distance = self.haversine(origin['lat'], origin['lng'], dest['lat'], dest['lng'])
+                        expense_per_mile = 2.0  # $2 per mile
+                        expense = distance * expense_per_mile
+                        self.trucks.at[idx, 'expense'] += expense
+                    
+                    # If finance tracking is enabled, show net profit
+                    net_profit = revenue - self.trucks.at[idx, 'expense'] if self.enable_finance else revenue
+                    print(f"✅ Truck {truck['truck_id']} delivered Load {load['load_id']} at {dest['city']}, {dest['state_name']} | Earned: ${revenue} | Net: ${net_profit}")
+
 
                     print(f"✅ Truck {truck['truck_id']} delivered Load {load['load_id']} at {dest['city']}, {dest['state_name']} | Earned: ${revenue}")
 

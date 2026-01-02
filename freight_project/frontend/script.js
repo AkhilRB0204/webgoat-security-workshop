@@ -11,6 +11,14 @@ async function refresh() {
 
     // --- Update or create truck markers ---
     data.trucks.forEach(truck => {
+        const popupContent = `
+        <b>${truck.truck_id}</b><br>
+        Status: ${truck.status}<br>
+        Assigned Load: ${truck.assigned_load || "None"}<br>
+        Profit: $${truck.profit.toFixed(2)}<br>
+        Expense: $${truck.expense.toFixed(2)}<br>
+        Net Profit: $${truck.net_profit.toFixed(2)}
+    `;
         if (truckMarkers[truck.truck_id]) {
             truckMarkers[truck.truck_id].setLatLng([truck.lat, truck.lon]);
             truckMarkers[truck.truck_id].bindPopup(`${truck.truck_id} - ${truck.status}`);
@@ -57,8 +65,9 @@ async function startSimulation() {
     const numTrucks = document.getElementById("numTrucks").value;
     const numLoads = document.getElementById("numLoads").value;
     const minPop = document.getElementById("minPop").value;
+    const enableFinance = document.getElementById("enableFinance").checked;
 
-    await fetch(`http://127.0.0.1:8000/init?num_trucks=${numTrucks}&num_loads=${numLoads}&min_pop=${minPop}`);
+    await fetch(`http://127.0.0.1:8000/init?num_trucks=${numTrucks}&num_loads=${numLoads}&min_pop=${minPop}&enable_finance=${enableFinance}`);
     alert("Simulation started!");
 }
 

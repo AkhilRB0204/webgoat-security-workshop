@@ -32,7 +32,8 @@ threading.Thread(target=run_sim, daemon=True).start()
 def init_sim(
     num_trucks: int = Query(50, description="Number of trucks"),
     num_loads: int = Query(20, description="Number of loads"),
-    min_pop: int = Query(100000, description="Minimum city population")
+    min_pop: int = Query(100000, description="Minimum city population"),
+    enable_finance: bool = Query(True, description="Enable profit/expense tracking")
 ):
     global sim
     # Create a new FreightSim instance
@@ -58,7 +59,10 @@ def get_status():
             "lat": truck["lat"],        # current latitude
             "lon": truck["lng"],        # current longitude
             "status": truck["status"],  # Idle or Assigned
-            "assigned_load": truck["assigned_load"]
+            "assigned_load": truck["assigned_load"],
+            "profit": truck["profit"],   # total profit earned
+            "expense": truck["expense"],  # total expense incurred
+            "net_profit": truck["profit"] - truck["expense"]  # net profit
         })
 
     # Build load status list
@@ -71,7 +75,7 @@ def get_status():
             "origin": origin["city"],
             "destination": dest["city"],
             "weight": load["weight"],
-            "value": load["value"],                   # profit/priority metric
+            "value": load["rate_per_ton"],                   # profit/priority metric
             "assigned_truck": load["assigned_truck"],
             "dest_latitude": dest["lat"],
             "dest_longitude": dest["lng"]

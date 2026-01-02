@@ -1,7 +1,7 @@
 from backend.freight_trading import FreightSim
 
 def main():
-    print("Freight Route Trading Simulator")
+    print("🚚 Freight Route Trading Simulator (with Finance Tracking)")
 
     # Ask user for input values
     num_trucks = int(input("Enter number of trucks: "))
@@ -23,6 +23,19 @@ def main():
     for step in range(num_steps):
         print(f"\n--- Simulation Step {step+1} ---")
         sim.update_trucks()
+
+        # print financial summary
+        total_revenue = sim.total_revenue()
+        total_expense = sim.total_expense()
+        net_profit = total_revenue - total_expense
+
+        print(f"💰 Revenue: ${total_revenue:.2f} | Expenses: ${total_expense:.2f} | Net Profit: ${net_profit:.2f}")
+    
+    print("\n✅ Simulation complete!")
+    print("Final Truck Profits:")
+    for _, truck in sim.trucks.iterrows():
+        print(f"Truck {truck['truck_id']}: Profit = ${truck['profit']:.2f}")
+
 
 if __name__ == "__main__":
     main()
