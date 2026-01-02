@@ -8,27 +8,70 @@
 </head>
 <body>
   <h1>Freight Simulation Dashboard</h1>
-  <div id="map" style="height:600px;"></div>
+<div class="control-panel">
+  <label>Number of Trucks:</label>
+  <input id="numTrucks" type="number" value="50" />
 
+  <label>Number of Loads:</label>
+  <input id="numLoads" type="number" value="20" />
+
+  <label>Minimum Population:</label>
+  <input id="minPop" type="number" value="100000" />
+
+  <button onclick="startSimulation()">Start Simulation</button>
+  <button onclick="createLoad()">Create Random Load</button>
+</div>
+
+<div id="map"></div>
   <script>
-    const map = L.map('map').setView([39.5, -98.35], 4); // Center US
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Initialize Leaflet map centered on the US
+  const map = L.map('map').setView([39.5, -98.35], 4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
-    }).addTo(map);
+  }).addTo(map);
 
+  let truckMarkers = {};
+
+  // Function to refresh truck positions and status from backend
     async function refresh() {
-      const res = await fetch("/status");
+      const res = await fetch("http://127.0.0.1:8000/status");
       const data = await res.json();
 
+      // Update or create markers for each truck
       data.trucks.forEach(truck => {
-        L.circleMarker([truck.lat, truck.lon], {radius: 5, color: "blue"})
-          .bindPopup(`${truck.truck_id} - ${truck.status}`)
-          .addTo(map);
+          if (truckMarkers[truck.truck_id]) {
+              // Move existing marker to new position
+              truckMarkers[truck.truck_id].setLatLng([truck.lat, truck.lon]);
+              truckMarkers[truck.truck_id].bindPopup(`Truck: ${truck.truck_id}<br>Status: ${truck.status}`);
+          } else {
+              // Create a new marker
+              truckMarkers[truck.truck_id] = L.circleMarker([truck.lat, truck.lon], {
+                  radius: 6,
+                  color: truck.status === "Idle" ? "green" : "orange" // color by status
+              }).addTo(map)
+                .bindPopup(`Truck: ${truck.truck_id}<br>Status: ${truck.status}`);
+          }
       });
-    }
+  }
+// Function to start simulation with dynamic user inputs
+  async function startSimulation() {
+      const numTrucks = parseInt(document.getElementById("numTrucks").value);
+      const numLoads = parseInt(document.getElementById("numLoads").value);
+      const minPop = parseInt(document.getElementById("minPop").value);
 
+      // Call backend endpoint to initialize simulation
+      await fetch(`http://127.0.0.1:8000/init?num_trucks=${numTrucks}&num_loads=${numLoads}&min_pop=${minPop}`);
+      alert("Simulation started!");
+  }
+
+  // Function to create a new random load
+  async function createLoad() {
+      await fetch("http://127.0.0.1:8000/create_load");
+  }
+
+  // Initial refresh and periodic updates every 1 second
     refresh();
-    setInterval(refresh, 3000); // update every 3 sec
-  </script>
+    setInterval(fetchStatus, 1000); 
+</script>
 </body>
 </html>

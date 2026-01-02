@@ -1,4 +1,4 @@
-from freight_sim import FreightSim
+from freight_trading import FreightSim
 
 def main():
     print("Freight Route Trading Simulator")
@@ -20,7 +20,7 @@ def main():
     sim.assign_loads()
 
     # Simulate step by step
-    for step in range(steps):
+    for step in range(num_steps):
         print(f"\n--- Simulation Step {step+1} ---")
         sim.update_trucks()
 
