@@ -4,19 +4,23 @@ OwlHacks 2025 Hackathon Project
 
 This project is a freight trading simulator I built for OwlHacks 2025. The idea is to mimic how trucks and shipments are matched in real life, so you can see who’s carrying what, track deliveries, and even create new loads on the fly. Everything is interactive and plotted on a map so you can watch the simulation happen in real-time.
 
+The simulation also tracks financial metrics for each truck, including profit, expenses, and net profit.
+
 Concept
 
-Freight trading is all about moving cargo efficiently—matching shipments with transport capacity and making smart delivery decisions. I tried to capture that in this project by:
+Freight trading is all about moving cargo efficiently—matching shipments with transport capacity and making smart delivery decisions. This project captures that by:
 
 Treating trucks like transport capacity and loads like shipments.
 
-Automatically assigning trucks to loads based on their capacity and location.
+Automatically assigning trucks to loads based on capacity, location, and availability.
 
-Letting you create new loads dynamically, which is like new opportunities popping up in the market.
+Allowing the creation of new loads dynamically, simulating new market opportunities.
 
-Updating everything live so you can see trucks move toward their destinations.
+Running a continuous simulation loop that updates trucks and loads every second.
 
-It’s a simplified way to explore how freight trading works without having to charter real ships or trucks.
+Tracking financial metrics for each truck: profit, expenses, and net profit.
+
+This is a simplified way to explore how freight trading works without using real trucks or logistics systems.
 
 Project Structure
 freight_project/
@@ -84,13 +88,13 @@ Enter simulation parameters and click Start Simulation.
 
 Click Create Random Load to add new shipments dynamically.
 
-CLI (Optional)
+CLI 
 
 Go to the cli/ folder.
 
 Run:
 
-python main.py
+python3 main.py
 
 
 Follow the prompts to simulate trucks and loads step by step.
@@ -105,7 +109,7 @@ Automatic assignment of trucks based on capacity and location.
 
 Dashed lines that show the path from trucks to their assigned loads.
 
-Optional CLI version for terminal-based simulation.
+CLI version for terminal-based simulation.
 
 Notes
 
