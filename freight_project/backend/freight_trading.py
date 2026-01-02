@@ -14,11 +14,11 @@ class FreightSim:
         # Create a fleet of trucks
         self.num_trucks = num_trucks
         self.trucks = pd.DataFrame({
-            'truck_id': [f"T{i+1}" for i in range(num_trucks)],   # Truck names T1, T2, ...
-            'city_idx': np.random.choice(self.cities.index, num_trucks),  # Start trucks in random cities
-            'capacity': np.random.randint(10, 30, num_trucks),    # Each truck can carry 10–30 tons
-            'status': ['Idle'] * num_trucks,                      # Idle = waiting for a job
-            'assigned_load': [None] * num_trucks                  # No load assigned yet
+            'truck_id': [f"T{i+1}" for i in range(num_trucks)],
+            'city_idx': np.random.choice(self.cities.index, num_trucks),
+            'capacity': np.random.randint(10, 30, num_trucks),
+            'status': ['Idle'] * num_trucks,
+            'assigned_load': [None] * num_trucks
         })
 
         # Add city details to each truck so we know where it is
@@ -32,7 +32,7 @@ class FreightSim:
         self.load_counter = 1
         self.loads = pd.DataFrame(columns=['load_id', 'origin_idx', 'dest_idx', 'weight', 'assigned_truck'])
     
-    # --- Function to calculate distance between two points on Earth ---
+    #  Function to calculate distance between two points on Earth 
     @staticmethod
     def haversine(lat1, lon1, lat2, lon2):
         # Convert lat/lon from degrees to radians
@@ -41,11 +41,11 @@ class FreightSim:
         dlon = lon2 - lon1 
         dlat = lat2 - lat1 
         a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-        c = 2 * asin(sqrt(a)) 
+        c = 2 * asin(sqrt(a))
         r = 3956  # radius of Earth in miles
         return c * r
 
-    # --- How good is this truck for this load? ---
+    #  How good is this truck for this load? 
     def score(self, truck_idx, load_idx):
         truck = self.trucks.loc[truck_idx]
         load = self.loads.loc[load_idx]
@@ -59,7 +59,7 @@ class FreightSim:
 
         return dist + capacity_penalty
 
-    # --- Make a new random shipment ---
+    #  Make a new random shipment 
     def create_random_load(self):
         # Pick a random city as the origin
         origin_idx = random.choice(self.cities.index)

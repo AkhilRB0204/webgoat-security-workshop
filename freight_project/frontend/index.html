@@ -31,6 +31,7 @@
   }).addTo(map);
 
   let truckMarkers = {};
+  let loadLines = {};
 
   // Function to refresh truck positions and status from backend
     async function refresh() {
@@ -52,7 +53,33 @@
                 .bindPopup(`Truck: ${truck.truck_id}<br>Status: ${truck.status}`);
           }
       });
-  }
+  
+  // Draw lines between trucks and their loads
+  data.loads.forEach(load => {
+          const lineId = load.load_id;
+          const originLatLng = [parseFloat(load.origin_lat || 0), parseFloat(load.origin_lon || 0)];
+          const destLatLng = [parseFloat(load.dest_lat || 0), parseFloat(load.dest_lon || 0)];
+
+          // Create or update polyline
+          if (!loadLines[lineId]) {
+              loadLines[lineId] = L.polyline([originLatLng, destLatLng], {
+                  color: "orange",
+                  weight: 2,
+                  dashArray: '5, 5'
+              }).addTo(map);
+          }
+      });
+  
+  // Remove lines for delivered loads
+      Object.keys(loadLines).forEach(lineId => {
+          const stillExists = data.loads.some(l => l.load_id === lineId);
+          if (!stillExists) {
+              map.removeLayer(loadLines[lineId]);
+              delete loadLines[lineId];
+          }
+      });
+    
+    }
 // Function to start simulation with dynamic user inputs
   async function startSimulation() {
       const numTrucks = parseInt(document.getElementById("numTrucks").value);
@@ -71,7 +98,7 @@
 
   // Initial refresh and periodic updates every 1 second
     refresh();
-    setInterval(fetchStatus, 1000); 
+    setInterval(refresh, 1000); 
 </script>
 </body>
 </html>

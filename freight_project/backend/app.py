@@ -71,6 +71,8 @@ def get_status():
             "load_id": load["load_id"],
             "origin": origin["city"],
             "destination": dest["city"],
+            "dest_latitude": dest["lat"],
+            "dest_longitude": dest["lng"],
             "weight": load["weight"],
             "assigned_truck": load["assigned_truck"]
         })
