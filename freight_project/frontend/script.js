@@ -4,6 +4,14 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 let truckMarkers = {};
 let loadLines = {};
 
+
+// Pick color based on profit
+function getTruckColor(netProfit) {
+    if (truck.status === "Idle") return "gray";
+    if (truck.net_profit > 0) return "green";
+    if (truck.net_profit < 0) return "red";
+    return "orange";
+}
 // --- Refresh map every second ---
 async function refresh() {
     const res = await fetch("http://127.0.0.1:8000/status");
@@ -77,5 +85,5 @@ async function createLoad() {
     refresh();  // Update map immediately
 }
 
-// --- Auto-refresh every 1 second ---
+// Auto-refresh every 1 second ---
 setInterval(refresh, 1000);
