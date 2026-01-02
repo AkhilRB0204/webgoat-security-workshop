@@ -16,10 +16,11 @@ app.add_middleware(
 
 sim = None  # Global simulation instance
 
-# Background thread to continuously update truck positions
+# Background thread to continuously update truck positions and reassign loads
 def run_sim():
     while True:
         if sim:
+            sim.assign_loads()   # Re-evaluate and assign loads dynamically
             sim.update_trucks()  # Move trucks step by step
         time.sleep(1)  # Update every second
 
@@ -69,10 +70,11 @@ def get_status():
             "load_id": load["load_id"],
             "origin": origin["city"],
             "destination": dest["city"],
-            "dest_latitude": dest["lat"],
-            "dest_longitude": dest["lng"],
             "weight": load["weight"],
-            "assigned_truck": load["assigned_truck"]
+            "value": load["value"],                   # profit/priority metric
+            "assigned_truck": load["assigned_truck"],
+            "dest_latitude": dest["lat"],
+            "dest_longitude": dest["lng"]
         })
 
     return {"trucks": trucks, "loads": loads}
