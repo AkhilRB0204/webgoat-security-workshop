@@ -92,6 +92,29 @@ Run:
 
 python main.py
 
+Running the Frontend
+
+Make sure your backend FastAPI server is running (uvicorn app:app --reload) at http://127.0.0.1:8000.
+
+Open the frontend/index.html file in a web browser. You don’t need a web server; just double-click the file or open it via your browser.
+
+On the dashboard:
+
+Enter simulation parameters (number of trucks, loads, minimum city population, finance tracking).
+
+Click Start Simulation to initialize the simulation.
+
+Use Create Random Load to add new shipments dynamically.
+
+The map will update in real time, showing truck positions, assigned loads, and delivery paths.
+
+
+cd frontend
+python -m http.server 8080
+
+
+Then open http://localhost:8080 in your browser.
+
 
 Follow the prompts to simulate trucks and loads step by step.
 
@@ -110,3 +133,4 @@ Optional CLI version for terminal-based simulation.
 Notes
 
 I built this for OwlHacks 2025 to explore freight logistics and trading in a visual, interactive way. It’s not a real freight market, but it gives a sense of how capacity, demand, and delivery timing all interact.
+
