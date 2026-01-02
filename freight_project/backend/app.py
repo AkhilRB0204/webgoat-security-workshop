@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from freight_trading import FreightSim
 import threading
 import time
+import os
 
 app = FastAPI()
 
