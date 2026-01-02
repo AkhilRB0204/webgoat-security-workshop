@@ -1,3 +1,4 @@
+# backend/app.py
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from freight_trading import FreightSim
@@ -6,7 +7,7 @@ import time
 
 app = FastAPI()
 
-# Allow cross-origin requests so the frontend can fetch data
+# Allow cross-origin requests so frontend can fetch data
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,32 +21,32 @@ sim = None  # Global simulation instance
 def run_sim():
     while True:
         if sim:
-            sim.assign_loads()   # Re-evaluate and assign loads dynamically
+            sim.assign_loads()   # Dynamically assign loads
             sim.update_trucks()  # Move trucks step by step
         time.sleep(1)  # Update every second
 
 # Start the background simulation thread
 threading.Thread(target=run_sim, daemon=True).start()
 
-# Initialize the simulation with dynamic parameters
+# --- Initialize simulation ---
 @app.get("/init")
 def init_sim(
     num_trucks: int = Query(50, description="Number of trucks"),
     num_loads: int = Query(20, description="Number of loads"),
     min_pop: int = Query(100000, description="Minimum city population"),
-    enable_finance: bool = Query(True, description="Enable profit/expense tracking")
+    enable_finance: bool = Query(False, description="Enable finance tracking")
 ):
     global sim
-    # Create a new FreightSim instance
-    sim = FreightSim("uscities.csv", num_trucks=num_trucks, min_pop=min_pop)
+    # Create new FreightSim instance with finance tracking option
+    sim = FreightSim("backend/uscities.csv", num_trucks=num_trucks, min_pop=min_pop, enable_finance=enable_finance)
 
     # Create initial random loads
     for _ in range(num_loads):
         sim.create_random_load()
 
-    return {"message": f"Simulation initialized with {num_trucks} trucks and {num_loads} loads."}
+    return {"message": f"Simulation initialized with {num_trucks} trucks and {num_loads} loads. Finance enabled: {enable_finance}"}
 
-# Endpoint to return current status of trucks and loads
+# --- Get current status of trucks and loads ---
 @app.get("/status")
 def get_status():
     if not sim:
@@ -60,9 +61,9 @@ def get_status():
             "lon": truck["lng"],        # current longitude
             "status": truck["status"],  # Idle or Assigned
             "assigned_load": truck["assigned_load"],
-            "profit": truck["profit"],   # total profit earned
-            "expense": truck["expense"],  # total expense incurred
-            "net_profit": truck["profit"] - truck["expense"]  # net profit
+            "profit": truck["profit"],
+            "expense": truck["expense"],
+            "net_profit": truck["profit"] - truck["expense"]
         })
 
     # Build load status list
@@ -75,7 +76,7 @@ def get_status():
             "origin": origin["city"],
             "destination": dest["city"],
             "weight": load["weight"],
-            "value": load["rate_per_ton"],                   # profit/priority metric
+            "rate_per_ton": load["rate_per_ton"],
             "assigned_truck": load["assigned_truck"],
             "dest_latitude": dest["lat"],
             "dest_longitude": dest["lng"]
@@ -83,7 +84,7 @@ def get_status():
 
     return {"trucks": trucks, "loads": loads}
 
-# Endpoint to create a new random load dynamically
+# --- Create a new random load dynamically ---
 @app.get("/create_load")
 def create_load():
     if sim:
