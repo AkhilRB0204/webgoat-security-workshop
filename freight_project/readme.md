@@ -18,25 +18,49 @@ Updating everything live so you can see trucks move toward their destinations.
 
 It’s a simplified way to explore how freight trading works without having to charter real ships or trucks.
 
-Project Structure freight_project/ │ ├── backend/ │ ├── app.py # FastAPI backend that handles all the simulation endpoints │ ├── freight_trading.py # All the simulation logic: trucks, loads, assignments, movement │ └── requirements.txt # Python packages: FastAPI, Uvicorn, Pandas, NumPy │ ├── frontend/ │ ├── index.html # My web dashboard with map, inputs, and controls │ ├── script.js # JS code for fetching backend data and updating the map │ └── style.css # Styles for the dashboard UI │ ├── cli/ │ └── main.py # Optional command-line interface version of the simulation │ └── README.md # This file
+Project Structure
+freight_project/
+│
+├── backend/
+│   ├── app.py            # FastAPI backend that handles all the simulation endpoints
+│   ├── freight_trading.py # All the simulation logic: trucks, loads, assignments, movement
+│   └── requirements.txt  # Python packages: FastAPI, Uvicorn, Pandas, NumPy
+│
+├── frontend/
+│   ├── index.html        # My web dashboard with map, inputs, and controls
+│   ├── script.js         # JS code for fetching backend data and updating the map
+│   └── style.css         # Styles for the dashboard UI
+│
+├── cli/
+│   └── main.py           # Optional command-line interface version of the simulation
+│
+└── README.md             # This file
 
 What each file does
 
-backend/app.py This is where the backend API lives. It starts the simulation, updates truck positions, and lets the frontend ask for the current status or create new loads.
+backend/app.py
+This is where the backend API lives. It starts the simulation, updates truck positions, and lets the frontend ask for the current status or create new loads.
 
-backend/freight_trading.py All the logic for the simulation happens here. Trucks, loads, assignment rules, distance calculations, and movement step-by-step are all handled in this file.
+backend/freight_trading.py
+All the logic for the simulation happens here. Trucks, loads, assignment rules, distance calculations, and movement step-by-step are all handled in this file.
 
-backend/requirements.txt Lists all the Python libraries you need to run the backend (FastAPI, Uvicorn, Pandas, NumPy).
+backend/requirements.txt
+Lists all the Python libraries you need to run the backend (FastAPI, Uvicorn, Pandas, NumPy).
 
-frontend/index.html The dashboard where you control the simulation. You can input the number of trucks and loads, start the simulation, and watch everything happen on a map.
+frontend/index.html
+The dashboard where you control the simulation. You can input the number of trucks and loads, start the simulation, and watch everything happen on a map.
 
-frontend/script.js This JS handles fetching the backend data, updating truck markers, drawing lines to loads, and keeping the map live and dynamic.
+frontend/script.js
+This JS handles fetching the backend data, updating truck markers, drawing lines to loads, and keeping the map live and dynamic.
 
-frontend/style.css Simple styling for the dashboard—makes the inputs, buttons, and map look clean.
+frontend/style.css
+Simple styling for the dashboard—makes the inputs, buttons, and map look clean.
 
-cli/main.py A command-line version of the simulation. Lets you run everything step by step in the terminal without using the web interface.
+cli/main.py
+A command-line version of the simulation. Lets you run everything step by step in the terminal without using the web interface.
 
-How to Run Backend
+How to Run
+Backend
 
 Go into the backend/ folder and activate your virtual environment.
 
@@ -44,9 +68,11 @@ Install dependencies:
 
 pip install -r requirements.txt
 
+
 Start the FastAPI server:
 
 uvicorn app:app --reload
+
 
 Server runs on http://127.0.0.1:8000.
 
@@ -65,6 +91,7 @@ Go to the cli/ folder.
 Run:
 
 python main.py
+
 
 Follow the prompts to simulate trucks and loads step by step.
 
